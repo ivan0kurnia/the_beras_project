@@ -225,7 +225,7 @@ void setup()
 
 void loop()
 {
-    if (rfid.getReadStatus() && !height.getCurrentMeasuringStatus() /*&& height.getCurrentHeightStatus() != Beras_MeasureHeight::HEIGHT_IS_CRITICAL*/)
+    if (rfid.getReadStatus() && !height.getCurrentMeasuringStatus() && height.getCurrentHeightStatus() != Beras_MeasureHeight::HEIGHT_IS_CRITICAL)
     {
         if (beras.getCurrentDeviceState() == BERAS_READY)
         {
