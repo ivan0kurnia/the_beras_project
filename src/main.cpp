@@ -110,6 +110,10 @@ void setup()
 
     digitalWrite(ERROR_LED, HIGH); // WiFi has yet to connect
 
+    ledcSetup(SERVO_CHANNEL, SERVO_FREQUENCY, SERVO_RESOLUTION);
+    ledcAttachPin(SERVO_MOTOR, SERVO_CHANNEL);
+    ledcWrite(SERVO_CHANNEL, SERVO_CLOSED_DUTY);
+
     Wire.begin(-1, -1, WIRE_CLOCK);
     Wire1.begin(SDA1, SCL1, WIRE1_CLOCK);
 
@@ -144,10 +148,6 @@ void setup()
 
     scale.begin(LOAD_CELL_DOUT, LOAD_CELL_CLCK);
     scale.set_scale(LOAD_CELL_SCALE);
-
-    ledcSetup(SERVO_CHANNEL, SERVO_FREQUENCY, SERVO_RESOLUTION);
-    ledcAttachPin(SERVO_MOTOR, SERVO_CHANNEL);
-    ledcWrite(SERVO_CHANNEL, SERVO_CLOSED_DUTY);
 
     ledcSetup(MECHANISM_MOTOR_CHANNEL1, MECHANISM_MOTOR_FREQUENCY, MECHANISM_MOTOR_RESOLUTION);
     ledcAttachPin(MECHANISM_MOTOR_IN1, MECHANISM_MOTOR_CHANNEL1);
