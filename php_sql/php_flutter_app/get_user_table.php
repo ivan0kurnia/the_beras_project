@@ -4,23 +4,14 @@ include 'config.php';
 
 $table_name = 'beras_users';
 $query = "
-    SELECT card_uid, 
-       IF(Isnull(user_middlename), Concat_ws(' ', user_firstname,  user_middlename), 
-       Concat_ws(' ', user_firstname, user_middlename, user_lastname)) AS 
-       'user_name', 
+SELECT card_uid, 
+       Concat_ws(' ', user_firstname,  user_lastname) AS 'user_name', 
        user_gender, 
        Concat_ws(' | ', Ifnull(user_landline_number, '-'), 
-       Ifnull(user_cellphone_number, '-'))                               AS 
-       'phone_number', 
-       user_address_ktp, 
+       Ifnull(user_cellphone_number, '-')) AS 'phone_number', 
        user_address_current, 
-       user_religion, 
-       user_marital_status, 
-       user_occupation, 
-       Concat_ws(', ', user_birthplace, user_birthdate) AS 'user_birth', 
        user_liability, 
        user_staple_quota, 
-       user_created_by, 
        user_creation_date 
 FROM   `beras_users` 
 ORDER  BY user_id ";

@@ -23,14 +23,6 @@ INSERT INTO `u216319883_beras_m_db`.`beras_admins`
 )
 VALUES
 ( -- 1
-    'ivan0kurnia',
-    'fcgbwe45',
-    'Ivan',
-    'Kurnia',
-    'ivan.kurnia.s@gmail.com',
-    '089614328623'
-),
-( -- 2
     'reynaldijavica',
     'godlike',
     'Reynaldi',
@@ -38,7 +30,7 @@ VALUES
     'reynaldijavica@gmail.com',
     '081284000465'
 ),
-( -- 3
+( -- 2
     'ed_ch98',
     'windows10',
     'Edward',
