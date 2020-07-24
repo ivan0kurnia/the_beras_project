@@ -59,31 +59,31 @@ TaskHandle_t Blynk_TaskHandle;
 
 namespace Beras_LCD
 {
-bool lcdIsPrintedBackToDefault = false;
-unsigned long lcdLastPrintTimestamp = 0;
+    bool lcdIsPrintedBackToDefault = false;
+    unsigned long lcdLastPrintTimestamp = 0;
 
-void printLcdBackToDefault();
+    void printLcdBackToDefault();
 }; // namespace Beras_LCD
 
 namespace Beras_Siren
 {
-const unsigned int dutySaveAddress = 0;
+    const unsigned int dutySaveAddress = 0;
 
-unsigned short ledDuty;
-unsigned short previousLedDuty;
+    unsigned short ledDuty;
+    unsigned short previousLedDuty;
 
-unsigned short savedLedDuty;
+    unsigned short savedLedDuty;
 }; // namespace Beras_Siren
 
 namespace Beras_Notification
 {
-const unsigned long criticalInterval = 3600000UL;
-const unsigned long lowInterval = 7200000UL;
+    const unsigned long criticalInterval = 3600000UL;
+    const unsigned long lowInterval = 7200000UL;
 
-unsigned long criticalTimestamp = UINT32_MAX - criticalInterval;
-unsigned long lowTimestamp = UINT32_MAX - lowInterval;
+    unsigned long criticalTimestamp = UINT32_MAX - criticalInterval;
+    unsigned long lowTimestamp = UINT32_MAX - lowInterval;
 
-bool sufficiencyIsNotified = true;
+    bool sufficiencyIsNotified = true;
 }; // namespace Beras_Notification
 
 void RFID_TaskFunction(void *);
@@ -225,7 +225,9 @@ void setup()
 
 void loop()
 {
-    if (rfid.getReadStatus() && !height.getCurrentMeasuringStatus() && height.getCurrentHeightStatus() != Beras_MeasureHeight::HEIGHT_IS_CRITICAL)
+    if (rfid.getReadStatus()                                                           // Baru jalan kalo ada kartu
+        && !height.getCurrentMeasuringStatus()                                         // Gak akan jalan kalo lagi measuring
+        && height.getCurrentHeightStatus() != Beras_MeasureHeight::HEIGHT_IS_CRITICAL) // Kalo tinggi kritis, beras gak akan ketuang
     {
         if (beras.getCurrentDeviceState() == BERAS_READY)
         {
@@ -244,7 +246,7 @@ void loop()
             {
                 if (payload[0] == 'A') // Authorized
                 {
-                    berasPayload.loadPayload(&payload);
+                    berasPayload.loadPayload(&payload); // Pecah payload ke dalam array
 
                     Serial.print("[M] Card accepted.");
                     Serial.println();
@@ -260,7 +262,7 @@ void loop()
                     lcd.print(berasPayload[1]);
                     lcd.setCursor(0, 1);
                     lcd.print("Kuota: ");
-                    lcd.print(static_cast<float>(berasPayload[2].toInt()) / 1000.0F, 1);
+                    lcd.print((float)berasPayload[2].toInt() / 1000.0F, 1);
                     lcd.print(" kg");
 
                     user.setUserData(berasPayload[1], berasPayload[2].toInt());
@@ -458,14 +460,14 @@ void loop()
                 static bool motorDirection = false;
                 if (!motorDirection) // Forward
                 {
-                    ledcWrite(MECHANISM_MOTOR_CHANNEL1, MECHANISM_MOTOR_DUTY);
+                    ledcWrite(MECHANISM_MOTOR_CHANNEL1, MECHANISM_MOTOR_DUTY /* 4095 */);
                     ledcWrite(MECHANISM_MOTOR_CHANNEL2, 0);
 
                     if (digitalRead(MECHANISM_SWITCH_1))
                     {
                         // Brake for 1 ms
-                        ledcWrite(MECHANISM_MOTOR_CHANNEL1, MECHANISM_MOTOR_MAX_DUTY);
-                        ledcWrite(MECHANISM_MOTOR_CHANNEL2, MECHANISM_MOTOR_MAX_DUTY);
+                        ledcWrite(MECHANISM_MOTOR_CHANNEL1, MECHANISM_MOTOR_MAX_DUTY /* 4095 */);
+                        ledcWrite(MECHANISM_MOTOR_CHANNEL2, MECHANISM_MOTOR_MAX_DUTY /* 4095 */);
                         delay(1);
 
                         ledcWrite(MECHANISM_MOTOR_CHANNEL1, 0);
@@ -485,13 +487,13 @@ void loop()
                 else // Backward
                 {
                     ledcWrite(MECHANISM_MOTOR_CHANNEL1, 0);
-                    ledcWrite(MECHANISM_MOTOR_CHANNEL2, MECHANISM_MOTOR_DUTY);
+                    ledcWrite(MECHANISM_MOTOR_CHANNEL2, MECHANISM_MOTOR_DUTY /* 4095 */);
 
                     if (digitalRead(MECHANISM_SWITCH_2))
                     {
                         // Brake for 1 ms
-                        ledcWrite(MECHANISM_MOTOR_CHANNEL1, MECHANISM_MOTOR_MAX_DUTY);
-                        ledcWrite(MECHANISM_MOTOR_CHANNEL2, MECHANISM_MOTOR_MAX_DUTY);
+                        ledcWrite(MECHANISM_MOTOR_CHANNEL1, MECHANISM_MOTOR_MAX_DUTY /* 4095 */);
+                        ledcWrite(MECHANISM_MOTOR_CHANNEL2, MECHANISM_MOTOR_MAX_DUTY /* 4095 */);
                         delay(1);
 
                         ledcWrite(MECHANISM_MOTOR_CHANNEL1, 0);
@@ -516,7 +518,7 @@ void loop()
                     beras.tellThisObjectOneTransferIsDone();
                     beras.setCurrentDeviceState(BERAS_PREPARING);
                 }
-                else
+                else // Jalan ketika getHowManyMoreTimesToTransfer() == 0
                 {
                     Serial.println("[M] Everything was done beautifully!");
 
@@ -557,7 +559,7 @@ void loop()
                 {
                     Blynk.virtualWrite(VL53L0X_ADDRESS, String(BERAS_HEIGHT_PERCENTAGES[berasHeight]).toInt());
 
-                    if (berasHeight < 1)
+                    if (berasHeight < 1) // Satuannya banyak sensor
                     {
                         height.setHeightStatus(Beras_MeasureHeight::HEIGHT_IS_CRITICAL);
                         Beras_Notification::criticalTimestamp -= Beras_Notification::criticalInterval;
@@ -636,8 +638,8 @@ void loop()
         height.resetMeasurement();
     }
 
-    printWifiStatus();
-    Beras_LCD::printLcdBackToDefault();
+    printWifiStatus();                  // Print status WiFi jika berubah
+    Beras_LCD::printLcdBackToDefault(); // Print LCD balik ke awal setelah 2.5 detik
 }
 
 void Beras_LCD::printLcdBackToDefault()
